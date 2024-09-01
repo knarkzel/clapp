@@ -1,16 +1,15 @@
 ;; Dependencies
-(ql:quickload '(:hunchentoot :easy-routes :spinneret :dexador :com.inuoe.jzon))
+(ql:quickload '(:hunchentoot :easy-routes :spinneret :cl-smtp))
 
 (defpackage :app 
-  (:use :cl :easy-routes :spinneret)
-  (:local-nicknames (:jzon :com.inuoe.jzon)))
+  (:use :cl :easy-routes :spinneret))
 
 (in-package :app)
 
 ;; HTML template
 (defmacro with-page ((&key title) &body body)
   `(with-html-string
-     (:doctype)
+       (:doctype)
      (:html
       (:head
        (:title ,title)
@@ -23,25 +22,21 @@
        (:style (:raw "body { font-family: Roboto; }"))
        (:script :src "https://unpkg.com/htmx.org@2.0.2"))
       (:body :class "container"
-       (:h1 ,title)
-       ,@body))))
+             (:h1 ,title)
+             ,@body))))
 
 ;; Routes
 (defroute home "/" ()
   (with-page (:title "Home")
-    (:div
-     (:p "Fetch latest data from news page")
-     (:button :hx-get "/items" :hx-target "div" "Click me"))))
+    (:form :action "/submit" :method :post
+           (:label :for "name" "Name" (:input :type "text" :name "name"))
+           (:label :for "age" "Age" (:input :type "number" :name "age"))
+           (:button :type "submit" "Submit"))))
 
-(defroute items "/items" ()
-  (let* ((response (dex:get "https://jsonplaceholder.typicode.com/photos"))
-         (items (jzon:parse response)))
-    (with-html-string
-      (:ul
-       (loop for item across items do
-         (:li
-          (:p (gethash "title" item))
-          (:img :src (gethash "url" item))))))))
+(defroute submit ("/submit" :method :post) (&post name age)
+  (with-page (:title "Created user")
+    (:p (format nil "Name: ~A" name))
+    (:p (format nil "Age: ~A" age))))
 
 ;; Create server
 (defvar *server* (make-instance 'easy-routes-acceptor :port 8080))
