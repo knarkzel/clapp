@@ -1,15 +1,23 @@
 ;; Dependencies
-(ql:quickload '(:hunchentoot :easy-routes :spinneret :cl-smtp))
+(ql:quickload '(:hunchentoot :easy-routes :spinneret :mito))
 
 (defpackage :app 
-  (:use :cl :easy-routes :spinneret))
+  (:use :cl :easy-routes :spinneret :mito))
 
 (in-package :app)
+
+;; Database
+(defvar *db* (connect-toplevel :sqlite3 :database-name "app"))
+
+(deftable user ()
+  ((name :col-type (:varchar 64))
+   (email :col-type (or (:varchar 128) :null))))
+(ensure-table-exists 'user)
 
 ;; HTML template
 (defmacro with-page ((&key title) &body body)
   `(with-html-string
-       (:doctype)
+     (:doctype)
      (:html
       (:head
        (:title ,title)
