@@ -28,23 +28,23 @@
        (:header
         (:nav
          (:ul
-          (:li (:strong "Halal")))
+          (:li (:strong "BILKURSEN")))
          (:ul
-          (:li (:a :href "/side-1" "Side 1"))
-          (:li (:a :href "/side-2" "Side 2"))
-          (:li (:a :href "/side-3" "Side 3")))))
-       (:main (:h1 ,title) ,@body)))))
+          (:li (:a :href "/kjøp-bil" "Kjøp bil"))
+          (:li (:a :href "/selg-bil" "Selg bil")))
+         (:ul
+          (:li (:button "Logg inn")))))
+       (:main ,@body)))))
 
 ;; Routes
-(defmacro section (&key left right)
-  `(with-html (:div :class "grid grid-cols-2 gap-4" ,left ,right)))
+(defmacro section (&key name text body)
+  `(with-html
+     (:div :class "grid grid-cols-2 gap-4 pb-4 border-b"
+           (:div (:h2 ,name) (:p ,text)) ,body)))
 
 (defroute home "/" ()
   (with-page (:title "Home")
     (:form :action "/submit" :method :post
-           (section
-            :left (:div
-                   (:h1 "Hello there")
-                   (:p "Amazing day today"))
-            :right (:div
-                    (:label :for "name" "Name" (:input :name "name")))))))
+           (section :name "Personal information"
+                    :text "This is specifically for people that haven't travelled before"
+                    :body (:div (:label :for "name" "Name" (:input :name "name")))))))
