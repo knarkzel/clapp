@@ -6,6 +6,13 @@
 
 (in-package :app)
 
+;; Create server
+(setf hunchentoot:*dispatch-table*
+      `(hunchentoot:dispatch-easy-handlers
+        ,(hunchentoot:create-folder-dispatcher-and-handler 
+          "/" "../static/")))
+(defvar *server* (make-instance 'easy-routes:easy-routes-acceptor :port 8080)) ;; (hunchentoot:start *server*)
+
 ;; HTML template
 (defmacro with-page ((&key title) &body body)
   `(with-html-string
@@ -17,7 +24,16 @@
        (:meta :name "viewport" :content "width=device-width, initial-scale=1")
        (:link :rel "stylesheet" :href "/pico.css")
        (:link :rel "stylesheet" :href "/styles.css"))
-      (:body (:main (:h1 ,title) ,@body)))))
+      (:body
+       (:header
+        (:nav
+         (:ul
+          (:li (:strong "Halal")))
+         (:ul
+          (:li (:a :href "/side-1" "Side 1"))
+          (:li (:a :href "/side-2" "Side 2"))
+          (:li (:a :href "/side-3" "Side 3")))))
+       (:main (:h1 ,title) ,@body)))))
 
 ;; Routes
 (defroute home "/" ()
@@ -26,15 +42,4 @@
            (:div :class "grid grid-cols-2 gap-4"
                  (:label :for "name" "Name" (:input :type "text" :name "name"))
                  (:label :for "age" "Age" (:input :type "number" :name "age")))
-           (:button "Submit"))))
-
-(defroute submit ("/submit" :method :post) (&post name age)
-  (redirect 'home))
-
-;; Create server
-(setf hunchentoot:*dispatch-table*
-      `(hunchentoot:dispatch-easy-handlers
-        ,(hunchentoot:create-folder-dispatcher-and-handler 
-          "/" "../static/")))
-(defvar *server* (make-instance 'easy-routes:easy-routes-acceptor :port 8080)) ;; (hunchentoot:start *server*)
-
+           (:button :type "submit" "Submit"))))
