@@ -1,5 +1,5 @@
 ;; Dependencies
-(ql:quickload '(:hunchentoot :easy-routes :spinneret :hunchentoot-errors))
+(ql:quickload '(:hunchentoot :easy-routes :spinneret :lass))
 
 (defpackage :app 
   (:use :cl :easy-routes :spinneret))
@@ -14,7 +14,7 @@
 (defvar *server* (make-instance 'easy-routes:easy-routes-acceptor :port 8080)) ;; (hunchentoot:start *server*)
 
 ;; HTML template
-(defmacro with-page ((&key title) &body body)
+(defmacro with-page ((&key title css) &body body)
   `(with-html-string
      (:doctype)
      (:html
@@ -23,7 +23,8 @@
        (:meta :charset "utf-8")
        (:meta :name "viewport" :content "width=device-width, initial-scale=1")
        (:link :rel "stylesheet" :href "/pico.css")
-       (:link :rel "stylesheet" :href "/styles.css"))
+       (:link :rel "stylesheet" :href "/styles.css")
+       ,@(when css `((:style ,(apply #'lass:compile-and-write css)))))
       (:body
        (:header
         (:nav
@@ -43,7 +44,7 @@
            (:div (:h2 ,name) (:p ,text)) ,body)))
 
 (defroute home "/" ()
-  (with-page (:title "Home")
+  (with-page (:title "Home" :css ((body :background "black")))
     (:form :action "/submit" :method :post
            (section :name "Personal information"
                     :text "This is specifically for people that haven't travelled before"
