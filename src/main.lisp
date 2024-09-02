@@ -1,5 +1,5 @@
 ;; Dependencies
-(ql:quickload '(:hunchentoot :easy-routes :spinneret))
+(ql:quickload '(:hunchentoot :easy-routes :spinneret :hunchentoot-errors))
 
 (defpackage :app 
   (:use :cl :easy-routes :spinneret))
