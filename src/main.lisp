@@ -36,10 +36,15 @@
        (:main (:h1 ,title) ,@body)))))
 
 ;; Routes
+(defmacro section (&key left right)
+  `(with-html (:div :class "grid grid-cols-2 gap-4" ,left ,right)))
+
 (defroute home "/" ()
   (with-page (:title "Home")
     (:form :action "/submit" :method :post
-           (:div :class "grid grid-cols-2 gap-4"
-                 (:label :for "name" "Name" (:input :type "text" :name "name"))
-                 (:label :for "age" "Age" (:input :type "number" :name "age")))
-           (:button :type "submit" "Submit"))))
+           (section
+            :left (:div
+                   (:h1 "Hello there")
+                   (:p "Amazing day today"))
+            :right (:div
+                    (:label :for "name" "Name" (:input :name "name")))))))
